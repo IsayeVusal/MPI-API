@@ -1,0 +1,39 @@
+
+from mpi4py import MPI
+import numpy as np 
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size=comm.size
+
+#Size of Vector = 10^7 
+
+a = np.random.randint(10000000)
+b = np.random.randint(10000000)
+data = ()
+add = ()
+av = ()
+
+def sum(a,b): #Add two vectors and store results in a third vector.
+    data = a+b
+    print("\n" "Result of adding vectors in 3rd Vector is: " + data)
+    
+    
+def average(data,aver): #Find an average of numbers in a vector.
+    data = a+b
+    add = np.mean(data) 
+    print("\n" + "Average number is: " + add)    
+
+add=np.array([rank]*(10)**7, dtype=float)
+if comm.rank == 0:
+    comm.send(add, dest = (rank +1)%size)
+if comm.rank > 0:
+    data = comm.recv(source =(rank-1)%size)
+    comm.send(add, dest=(rank+1)%size)
+if comm.rank == 0:
+    data = comm.recv(source=size-1)
+    
+print("my rank is " + str(rank))
+print("i received this")
+print(data)  
+
